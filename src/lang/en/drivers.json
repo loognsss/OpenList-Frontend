@@ -345,6 +345,7 @@
     "enable_folder_size": "Enable folder size",
     "enable_thumb": "Enable thumb",
     "enable_version_upload": "Enable version upload",
+    "hide_uploading": "Hide uploading",
     "order_by": "Order by",
     "order_bys": {
       "created_at": "Created at",
@@ -747,6 +748,7 @@
   },
   "Quark": {
     "cookie": "Cookie",
+    "only_list_video_file": "Only list video file",
     "order_by": "Order by",
     "order_bys": {
       "file_name": "File name",
@@ -759,7 +761,9 @@
       "asc": "Asc",
       "desc": "Desc"
     },
-    "root_folder_id": "Root folder id"
+    "root_folder_id": "Root folder id",
+    "use_transcoding_address": "Use transcoding address",
+    "use_transcoding_address-tips": "You can watch the transcoded video and support 302 redirection"
   },
   "QuarkOpen": {
     "access_token": "Access token",
@@ -839,6 +843,15 @@
     "root_folder_path": "Root folder path",
     "token": "Token",
     "username": "Username"
+  },
+  "Strm": {
+    "encodePath": "EncodePath",
+    "encodePath-tips": "encode the path in the strm file",
+    "filterFileTypes": "FilterFileTypes",
+    "filterFileTypes-tips": "Supports suffix name of strm file",
+    "paths": "Paths",
+    "siteUrl": "SiteUrl",
+    "siteUrl-tips": "The prefix URL of the strm file"
   },
   "Teambition": {
     "cookie": "Cookie",
@@ -1032,13 +1045,9 @@
     "username": "Username",
     "username-tips": "login type is user,this is required"
   },
-  "Trainbit": {
-    "AUSHELLPORTAL": "AUSHELLPORTAL",
-    "apikey": "Apikey",
-    "root_folder_id": "Root folder id"
-  },
   "UC": {
     "cookie": "Cookie",
+    "only_list_video_file": "Only list video file",
     "order_by": "Order by",
     "order_bys": {
       "file_name": "File name",
@@ -1051,7 +1060,9 @@
       "asc": "Asc",
       "desc": "Desc"
     },
-    "root_folder_id": "Root folder id"
+    "root_folder_id": "Root folder id",
+    "use_transcoding_address": "Use transcoding address",
+    "use_transcoding_address-tips": "You can watch the transcoded video and support 302 redirection"
   },
   "UCTV": {
     "device_id": "Device id",
@@ -1214,6 +1225,7 @@
     "SFTP": {},
     "SMB": {},
     "Seafile": {},
+    "Strm": {},
     "Teambition": {},
     "Terabox": {},
     "Thunder": {},
@@ -1222,7 +1234,6 @@
     "ThunderExpert": {},
     "ThunderX": {},
     "ThunderXExpert": {},
-    "Trainbit": {},
     "UC": {},
     "UCTV": {},
     "USS": {},
@@ -1292,6 +1303,7 @@
     "SFTP": "SFTP",
     "SMB": "SMB",
     "Seafile": "Seafile",
+    "Strm": "Strm",
     "Teambition": "Teambition",
     "Terabox": "Terabox",
     "Thunder": "Thunder",
@@ -1300,7 +1312,6 @@
     "ThunderExpert": "ThunderExpert",
     "ThunderX": "ThunderX",
     "ThunderXExpert": "ThunderXExpert",
-    "Trainbit": "Trainbit",
     "UC": "UC",
     "UCTV": "UCTV",
     "USS": "USS",
