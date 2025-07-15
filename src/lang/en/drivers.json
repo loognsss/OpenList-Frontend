@@ -23,8 +23,8 @@
   },
   "115 Open": {
     "access_token": "Access token",
-    "limit_rate,string": "Limit rate,string",
-    "limit_rate,string-tips": "limit all api request rate ([limit]r/1s)",
+    "limit_rate": "Limit rate",
+    "limit_rate-tips": "limit all api request rate ([limit]r/1s)",
     "order_by": "Order by",
     "order_bys": {
       "file_name": "File name",
@@ -207,6 +207,11 @@
     "root_folder_id": "Root folder id"
   },
   "AliyundriveOpen": {
+    "alipan_type": "Alipan type",
+    "alipan_types": {
+      "alipanTV": "AlipanTV",
+      "default": "Default"
+    },
     "api_url_address": "Api url address",
     "client_id": "Client id",
     "client_id-tips": "Keep it empty if you don't have one",
