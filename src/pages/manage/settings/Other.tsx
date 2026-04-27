@@ -20,11 +20,14 @@ const OtherSettings = () => {
   const [uri, setUri] = createSignal("")
   const [secret, setSecret] = createSignal("")
   const [qbitUrl, setQbitUrl] = createSignal("")
+  const [pan123TempDir, set123TempDir] = createSignal("")
   const [qbitSeedTime, setQbitSeedTime] = createSignal("")
   const [transmissionUrl, setTransmissionUrl] = createSignal("")
   const [transmissionSeedTime, setTransmissionSeedTime] = createSignal("")
   const [pan115TempDir, set115TempDir] = createSignal("")
   const [pan115OpenTempDir, set115OpenTempDir] = createSignal("")
+  const [pan123OpenTempDir, set123OpenTempDir] = createSignal("")
+  const [pan123OpenCallbackUrl, set123OpenCallbackUrl] = createSignal("")
   const [pikpakTempDir, setPikPakTempDir] = createSignal("")
   const [thunderTempDir, setThunderTempDir] = createSignal("")
   const [thunderBrowserTempDir, setThunderBrowserTempDir] = createSignal("")
@@ -53,6 +56,12 @@ const OtherSettings = () => {
         seedtime: transmissionSeedTime(),
       }),
   )
+  const [set123PanLoading, set123Pan] = useFetch(
+    (): PResp<string> =>
+      r.post("/admin/setting/set_123_pan", {
+        temp_dir: pan123TempDir(),
+      }),
+  )
   const [set115Loading, set115] = useFetch(
     (): PResp<string> =>
       r.post("/admin/setting/set_115", {
@@ -63,6 +72,13 @@ const OtherSettings = () => {
     (): PResp<string> =>
       r.post("/admin/setting/set_115_open", {
         temp_dir: pan115OpenTempDir(),
+      }),
+  )
+  const [set123OpenLoading, set123Open] = useFetch(
+    (): PResp<string> =>
+      r.post("/admin/setting/set_123_open", {
+        temp_dir: pan123OpenTempDir(),
+        callback_url: pan123OpenCallbackUrl(),
       }),
   )
   const [setPikPakLoading, setPikPak] = useFetch(
@@ -96,6 +112,7 @@ const OtherSettings = () => {
       setSecret(data.find((i) => i.key === "aria2_secret")?.value || "")
       setToken(data.find((i) => i.key === "token")?.value || "")
       setQbitUrl(data.find((i) => i.key === "qbittorrent_url")?.value || "")
+      set123TempDir(data.find((i) => i.key === "123_pan_temp_dir")?.value || "")
       setQbitSeedTime(
         data.find((i) => i.key === "qbittorrent_seedtime")?.value || "",
       )
@@ -108,6 +125,12 @@ const OtherSettings = () => {
       set115TempDir(data.find((i) => i.key === "115_temp_dir")?.value || "")
       set115OpenTempDir(
         data.find((i) => i.key === "115_open_temp_dir")?.value || "",
+      )
+      set123OpenTempDir(
+        data.find((i) => i.key == "123_open_temp_dir")?.value || "",
+      )
+      set123OpenCallbackUrl(
+        data.find((i) => i.key === "123_open_callback_url")?.value || "",
       )
       setPikPakTempDir(
         data.find((i) => i.key === "pikpak_temp_dir")?.value || "",
@@ -155,7 +178,7 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_aria2")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.qbittorrent")}</Heading>
       <SimpleGrid gap="$2" columns={{ "@initial": 1, "@md": 2 }}>
@@ -180,7 +203,7 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_qbit")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.transmission")}</Heading>
       <SimpleGrid gap="$2" columns={{ "@initial": 1, "@md": 2 }}>
@@ -205,12 +228,12 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_transmission")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.115")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
         <FormLabel for="115_temp_dir" display="flex" alignItems="center">
-          {t(`settings.115_temp_dir`)}
+          {t("settings_other.115_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="115_temp_dir"
@@ -228,12 +251,12 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_115")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.115_open")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
         <FormLabel for="115_open_temp_dir" display="flex" alignItems="center">
-          {t(`settings.115_open_temp_dir`)}
+          {t("settings_other.115_open_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="115_open_temp_dir"
@@ -251,12 +274,70 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_115_open")}
+        {t("global.save")}
+      </Button>
+      <Heading my="$2">{t("settings_other.123_pan")}</Heading>
+      <FormControl w="$full" display="flex" flexDirection="column">
+        <FormLabel for="123_temp_dir" display="flex" alignItems="center">
+          {t("settings_other.123_temp_dir")}
+        </FormLabel>
+        <FolderChooseInput
+          id="123_temp_dir"
+          value={pan123TempDir()}
+          onChange={(path) => set123TempDir(path)}
+        />
+      </FormControl>
+      <Button
+        my="$2"
+        loading={set123PanLoading()}
+        onClick={async () => {
+          const resp = await set123Pan()
+          handleResp(resp, (data) => {
+            notify.success(data)
+          })
+        }}
+      >
+        {t("global.save")}
+      </Button>
+      <Heading my="$2">{t("settings_other.123_open")}</Heading>
+      <FormControl w="$full" display="flex" flexDirection="column">
+        <FormLabel for="123_open_temp_dir" display="flex" alignItems="center">
+          {t("settings_other.123_open_temp_dir")}
+        </FormLabel>
+        <FolderChooseInput
+          id="123_open_temp_dir"
+          value={pan123OpenTempDir()}
+          onChange={(path) => set123OpenTempDir(path)}
+        />
+        <FormLabel
+          for="123_open_callback_url"
+          display="flex"
+          alignItems="center"
+        >
+          {t("settings_other.123_open_callback_url")}
+        </FormLabel>
+        <Input
+          id="123_open_callback_url"
+          value={pan123OpenCallbackUrl()}
+          onInput={(e) => set123OpenCallbackUrl(e.target.value)}
+        />
+      </FormControl>
+      <Button
+        my="$2"
+        loading={set123OpenLoading()}
+        onClick={async () => {
+          const resp = await set123Open()
+          handleResp(resp, (data) => {
+            notify.success(data)
+          })
+        }}
+      >
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.pikpak")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
         <FormLabel for="pikpak_temp_dir" display="flex" alignItems="center">
-          {t(`settings.pikpak_temp_dir`)}
+          {t("settings_other.pikpak_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="pikpak_temp_dir"
@@ -274,12 +355,12 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_pikpak")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.thunder")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
         <FormLabel for="thunder_temp_dir" display="flex" alignItems="center">
-          {t(`settings.thunder_temp_dir`)}
+          {t("settings_other.thunder_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="thunder_temp_dir"
@@ -297,7 +378,7 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_thunder")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.thunder_browser")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
@@ -306,7 +387,7 @@ const OtherSettings = () => {
           display="flex"
           alignItems="center"
         >
-          {t(`settings.thunder_browser_temp_dir`)}
+          {t("settings_other.thunder_browser_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="thunder_browser_temp_dir"
@@ -324,12 +405,12 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_thunder_browser")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings_other.thunderx")}</Heading>
       <FormControl w="$full" display="flex" flexDirection="column">
         <FormLabel for="thunderX_temp_dir" display="flex" alignItems="center">
-          {t(`settings.thunderX_temp_dir`)}
+          {t("settings_other.thunderX_temp_dir")}
         </FormLabel>
         <FolderChooseInput
           id="thunderX_temp_dir"
@@ -347,7 +428,7 @@ const OtherSettings = () => {
           })
         }}
       >
-        {t("settings_other.set_thunderX")}
+        {t("global.save")}
       </Button>
       <Heading my="$2">{t("settings.token")}</Heading>
       <Input value={token()} readOnly />

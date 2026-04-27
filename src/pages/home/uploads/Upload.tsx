@@ -15,7 +15,7 @@ import {
 } from "@hope-ui/solid"
 import { createSignal, For, Show } from "solid-js"
 import { usePath, useRouter, useT } from "~/hooks"
-import { getMainColor } from "~/store"
+import { getMainColor, uploadConfig, setUploadConfig } from "~/store"
 import {
   RiDocumentFolderUploadFill,
   RiDocumentFileUploadFill,
@@ -49,11 +49,14 @@ const UploadFile = (props: UploadFileProps) => {
       >
         {props.path}
       </Text>
-      <HStack spacing="$2">
-        <Badge colorScheme={StatusBadge[props.status]}>
-          {t(`home.upload.${props.status}`)}
-        </Badge>
-        <Text>{getFileSize(props.speed)}/s</Text>
+      <HStack spacing="$2" w="$full" justifyContent="space-between">
+        <HStack spacing="$2">
+          <Badge colorScheme={StatusBadge[props.status]}>
+            {t(`home.upload.${props.status}`)}
+          </Badge>
+          <Text>{getFileSize(props.speed)}/s</Text>
+        </HStack>
+        <Text color="$neutral11">{getFileSize(props.size)}</Text>
       </HStack>
       <Progress
         w="$full"
@@ -76,9 +79,6 @@ const Upload = () => {
   const { refresh } = usePath()
   const [drag, setDrag] = createSignal(false)
   const [uploading, setUploading] = createSignal(false)
-  const [asTask, setAsTask] = createSignal(false)
-  const [overwrite, setOverwrite] = createSignal(false)
-  const [rapid, setRapid] = createSignal(true)
   const [uploadFiles, setUploadFiles] = createStore<{
     uploads: UploadFileProps[]
   }>({
@@ -101,11 +101,13 @@ const Upload = () => {
     for await (const ms of asyncPool(3, files, handleFile)) {
       console.log(ms)
     }
-    refresh(undefined, true)
+    refresh()
   }
   const setUpload = (path: string, key: keyof UploadFileProps, value: any) => {
     setUploadFiles("uploads", (upload) => upload.path === path, key, value)
   }
+
+  // All upload methods are available by default
   const uploaders = getUploads()
   const [curUploader, setCurUploader] = createSignal(uploaders[0])
   const handleFile = async (file: File) => {
@@ -113,16 +115,18 @@ const Upload = () => {
     setUpload(path, "status", "uploading")
     const uploadPath = pathJoin(pathname(), path)
     try {
-      const err = await curUploader().upload(
-        uploadPath,
-        file,
-        (key, value) => {
-          setUpload(path, key, value)
-        },
-        asTask(),
-        overwrite(),
-        rapid(),
-      )
+      const err = await curUploader()
+        .upload(
+          uploadPath,
+          file,
+          (key, value) => {
+            setUpload(path, key, value)
+          },
+          uploadConfig.asTask,
+          uploadConfig.overwrite,
+          uploadConfig.rapid,
+        )
+        .catch((err) => err)
       if (!err) {
         setUpload(path, "status", "success")
         setUpload(path, "progress", 100)
@@ -246,7 +250,7 @@ const Upload = () => {
             </Heading>
             <Box w={{ "@initial": "80%", "@md": "30%" }}>
               <SelectWrapper
-                value={curUploader().name}
+                value={curUploader()?.name}
                 onChange={(name) => {
                   setCurUploader(
                     uploaders.find((uploader) => uploader.name === name)!,
@@ -297,25 +301,25 @@ const Upload = () => {
               direction={{ "@initial": "column", "@md": "row" }}
             >
               <Checkbox
-                checked={asTask()}
+                checked={uploadConfig.asTask}
                 onChange={() => {
-                  setAsTask(!asTask())
+                  setUploadConfig({ asTask: !uploadConfig.asTask })
                 }}
               >
                 {t("home.upload.add_as_task")}
               </Checkbox>
               <Checkbox
-                checked={overwrite()}
+                checked={uploadConfig.overwrite}
                 onChange={() => {
-                  setOverwrite(!overwrite())
+                  setUploadConfig({ overwrite: !uploadConfig.overwrite })
                 }}
               >
                 {t("home.conflict_policy.overwrite_existing")}
               </Checkbox>
               <Checkbox
-                checked={rapid()}
+                checked={uploadConfig.rapid}
                 onChange={() => {
-                  setRapid(!rapid())
+                  setUploadConfig({ rapid: !uploadConfig.rapid })
                 }}
               >
                 {t("home.upload.try_rapid")}

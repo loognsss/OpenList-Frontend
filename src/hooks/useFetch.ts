@@ -11,14 +11,11 @@ export const useLoading = <T>(
     loading,
     async (...arg: any[]) => {
       setLoading(true)
-      const data = await p(...arg)
-      if (!fetch || (data as EmptyResp).code !== 401) {
-        // why?
-        // because if setLoading(false) here will rerender before navigate
-        // maybe cause some bugs
+      try {
+        return await p(...arg)
+      } finally {
         setLoading(false)
       }
-      return data
     },
   ]
 }
@@ -40,11 +37,11 @@ const useListLoading = <T, K>(
     loading,
     async (key: K, ...arg: any[]) => {
       setLoading(() => key)
-      const data = await p(key, ...arg)
-      if (!fetch || (data as EmptyResp).code !== 401) {
+      try {
+        return await p(key, ...arg)
+      } finally {
         setLoading(undefined)
       }
-      return data
     },
   ]
 }

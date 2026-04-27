@@ -10,7 +10,7 @@ export const StreamUpload: Upload = async (
   asTask = false,
   overwrite = false,
   rapid = false,
-): Promise<Error | undefined> => {
+): Promise<undefined> => {
   let oldTimestamp = new Date().valueOf()
   let oldLoaded = 0
   let headers: { [k: string]: any } = {
@@ -22,11 +22,15 @@ export const StreamUpload: Upload = async (
     Overwrite: overwrite.toString(),
   }
   if (rapid) {
-    const { md5, sha1, sha256 } = await calculateHash(file)
+    setUpload("status", "hashing")
+    const { md5, sha1, sha256 } = await calculateHash(file, (p) => {
+      setUpload("progress", p | 0)
+    })
     headers["X-File-Md5"] = md5
     headers["X-File-Sha1"] = sha1
     headers["X-File-Sha256"] = sha256
   }
+  setUpload("status", "uploading")
   const resp: EmptyResp = await r.put("/fs/put", file, {
     headers: headers,
     onUploadProgress: (progressEvent) => {
@@ -58,6 +62,6 @@ export const StreamUpload: Upload = async (
   if (resp.code === 200) {
     return
   } else {
-    return new Error(resp.message)
+    throw new Error(resp.message)
   }
 }

@@ -9,11 +9,11 @@ import {
   Icon,
   IconButton,
 } from "@hope-ui/solid"
-import { For, JSXElement, createSignal, createMemo } from "solid-js"
-import { useRouter, useLink, useT } from "~/hooks"
-import { objStore } from "~/store"
+import { For, JSXElement, createSignal, createMemo, Show } from "solid-js"
+import { useRouter, useLink, useT, usePath, getGlobalPage } from "~/hooks"
+import { getPagination, objStore } from "~/store"
 import { ObjType } from "~/types"
-import { convertURL, getPlatform } from "~/utils"
+import { convertURL, getPlatform, pathDir } from "~/utils"
 import Artplayer from "artplayer"
 import { SelectWrapper } from "~/components"
 import { BsArrowRight } from "solid-icons/bs"
@@ -43,6 +43,12 @@ export const players: {
     name: "VLC",
     scheme: "vlc://$durl",
     platforms: ["Windows", "MacOS", "Linux", "Android", "iOS"],
+  },
+  {
+    icon: "android",
+    name: "Android",
+    scheme: "intent:$durl#Intent;type=video/*;S.title=$name;end",
+    platforms: ["Android"],
   },
   {
     icon: "nplayer",
@@ -109,7 +115,7 @@ export const AutoHeightPlugin = (player: Artplayer) => {
   player.on("ready", () => {
     const offsetBottom = "1.75rem" // position bottom of "More" button + padding
     $videoBox.style.maxHeight = `calc(100vh - ${$videoBox.offsetTop}px - ${offsetBottom})`
-    $videoBox.style.minHeight = "320px" // min width of mobie phone
+    $videoBox.style.minHeight = "320px" // min width of mobile phone
     player.autoHeight()
   })
   player.on("resize", () => {
@@ -126,12 +132,45 @@ export const VideoBox = (props: {
   children: JSXElement
   onAutoNextChange: (v: boolean) => void
 }) => {
-  const { replace } = useRouter()
+  const { replace, pathname } = useRouter()
   const { currentObjLink } = useLink()
-  let videos = objStore.objs.filter((obj) => obj.type === ObjType.VIDEO)
-  if (videos.length === 0) {
-    videos = [objStore.obj]
-  }
+  const { handleFolder } = usePath()
+  const [videoName, setVideoName] = createSignal("")
+  const videos = createMemo(() => {
+    let isLoadMore = true,
+      isLast = false
+    const videos = objStore.objs.filter((obj) => {
+      if (obj.type !== ObjType.VIDEO) return false
+      if (obj.name === objStore.obj.name) {
+        isLoadMore = false
+        isLast = true
+        setVideoName(obj.name)
+      } else isLast = false
+      return true
+    })
+    if (isLast) {
+      isLoadMore = getPagination().type !== "all"
+    }
+    if (isLoadMore) {
+      let path = pathname()
+      if (!path.endsWith(objStore.obj.name)) {
+        // 单文件分享
+        videos.push(objStore.obj)
+        setVideoName(objStore.obj.name)
+        return videos
+      }
+      const append = objStore.objs.length > 0
+      handleFolder(
+        pathDir(path),
+        getGlobalPage() + (append ? 1 : 0),
+        undefined,
+        append,
+        false,
+        true,
+      )
+    }
+    return videos
+  })
   const t = useT()
   let autoNext = localStorage.getItem("video_auto_next")
   if (!autoNext) {
@@ -153,30 +192,32 @@ export const VideoBox = (props: {
   return (
     <VStack w="$full" spacing="$2">
       {props.children}
-      <HStack spacing="$2" w="$full">
-        <SelectWrapper
-          onChange={(name: string) => {
-            replace(name)
-          }}
-          value={objStore.obj.name}
-          options={videos.map((obj) => ({ value: obj.name }))}
-        />
-        <Switch
-          css={{
-            whiteSpace: "nowrap",
-          }}
-          defaultChecked={autoNext === "true"}
-          onChange={(e: { currentTarget: HTMLInputElement }) => {
-            props.onAutoNextChange(e.currentTarget.checked)
-            localStorage.setItem(
-              "video_auto_next",
-              e.currentTarget.checked.toString(),
-            )
-          }}
-        >
-          {t("home.preview.auto_next")}
-        </Switch>
-      </HStack>
+      <Show when={videoName() !== ""}>
+        <HStack spacing="$2" w="$full">
+          <SelectWrapper
+            onChange={(name: string) => {
+              replace(name)
+            }}
+            value={videoName()}
+            options={videos().map((obj) => ({ value: obj.name }))}
+          />
+          <Switch
+            css={{
+              whiteSpace: "nowrap",
+            }}
+            defaultChecked={autoNext === "true"}
+            onChange={(e: { currentTarget: HTMLInputElement }) => {
+              props.onAutoNextChange(e.currentTarget.checked)
+              localStorage.setItem(
+                "video_auto_next",
+                e.currentTarget.checked.toString(),
+              )
+            }}
+          >
+            {t("home.preview.auto_next")}
+          </Switch>
+        </HStack>
+      </Show>
       <Flex wrap="wrap" gap="$1" justifyContent="center" alignItems="center">
         <For each={platformPlayers()}>
           {(item) => {

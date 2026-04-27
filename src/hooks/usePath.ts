@@ -149,6 +149,7 @@ export const usePath = () => {
     size?: number,
     append = false,
     force?: boolean,
+    onlyList = false,
   ) => {
     if (!size) {
       size = pagination.size
@@ -156,7 +157,8 @@ export const usePath = () => {
     if (size !== undefined && pagination.type === "all") {
       size = undefined
     }
-    ObjStore.setState(append ? State.FetchingMore : State.FetchingObjs)
+    !onlyList &&
+      ObjStore.setState(append ? State.FetchingMore : State.FetchingObjs)
     const resp = await getObjs({ path, index, size, force })
     handleRespWithoutNotify(
       resp,
@@ -168,10 +170,15 @@ export const usePath = () => {
           ObjStore.setObjs(data.content ?? [])
           ObjStore.setTotal(data.total)
         }
+        if (onlyList) {
+          return
+        }
         ObjStore.setReadme(data.readme)
         ObjStore.setHeader(data.header)
         ObjStore.setWrite(data.write)
+        ObjStore.setWriteContentBypass(data.write_content_bypass)
         ObjStore.setProvider(data.provider)
+        ObjStore.setDirectUploadTools(data.direct_upload_tools)
         ObjStore.setState(State.Folder)
       },
       handleErr,
@@ -205,8 +212,9 @@ export const usePath = () => {
     return handleFolder(pathname(), globalPage + 1, undefined, true)
   }
   return {
-    handlePathChange: handlePathChange,
-    setPathAs: setPathAs,
+    handlePathChange,
+    handleFolder,
+    setPathAs,
     refresh: async (retry_pass?: boolean, force?: boolean) => {
       const path = pathname()
       const scroll = window.scrollY
@@ -226,7 +234,7 @@ export const usePath = () => {
       }
       window.scroll({ top: scroll, behavior: "smooth" })
     },
-    loadMore: loadMore,
+    loadMore,
     allLoaded: () => globalPage >= Math.ceil(objStore.total / pagination.size),
   }
 }
