@@ -6,39 +6,29 @@ export const useCDN = () => {
 
   const npm = (name: string, version: string, path: string) => {
     // Available: https://github.com/cnpm/unpkg-white-list
-    // https://registry.npmmirror.com/monaco-editor/0.52.2/files/min/vs/loader.js
+    // https://registry.npmmirror.com/monaco-editor/0.55.1/files/min/vs/loader.js
     return `https://registry.npmmirror.com/${name}/${version}/files/${path}`
 
-    // https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js
+    // https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.js
     // return `https://cdn.jsdelivr.net/npm/${name}@${version}/${path}`
   }
 
   const monacoPath = () => {
     return import.meta.env.VITE_LITE === "true"
-      ? npm("monaco-editor", "0.52.2", "min/vs")
+      ? npm("monaco-editor", "0.55.1", "min/vs")
       : `${static_path}/monaco-editor/vs`
   }
 
   const katexCSSPath = () => {
     return import.meta.env.VITE_LITE === "true"
-      ? npm("katex", "0.16.11", "dist/katex.min.css")
+      ? npm("katex", "0.16.28", "dist/katex.min.css")
       : `${static_path}/katex/katex.min.css`
   }
 
   const mermaidJSPath = () => {
     return import.meta.env.VITE_LITE === "true"
-      ? npm("mermaid", "11.1.0", "dist/mermaid.min.js")
+      ? npm("mermaid", "11.13.0", "dist/mermaid.min.js")
       : `${static_path}/mermaid/mermaid.min.js`
-  }
-
-  const ruffleJSPath = () => {
-    return import.meta.env.VITE_LITE === "true"
-      ? npm(
-          packageJson.name,
-          packageJson.version,
-          "dist/static/ruffle/ruffle.js",
-        )
-      : `${static_path}/ruffle/ruffle.js`
   }
 
   const libHeifPath = () => {
@@ -64,7 +54,6 @@ export const useCDN = () => {
     monacoPath,
     katexCSSPath,
     mermaidJSPath,
-    ruffleJSPath,
     libHeifPath,
     libAssPath,
     fontsPath,

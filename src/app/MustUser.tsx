@@ -39,6 +39,7 @@ const UserOrGuest = (props: { children: JSXElement }) => {
         disabled: false,
         permission: 0,
         sso_id: "",
+        allow_ldap: false,
         otp: false,
       })
       setSkipLogin(true)

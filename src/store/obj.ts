@@ -28,12 +28,14 @@ const initialObjStore = {
   readme: "",
   header: "",
   provider: "",
+  direct_upload_tools: <string[] | undefined>undefined,
   state: State.Initial,
   err: "",
 }
 const [objStore, setObjStore] = createStore<
   typeof initialObjStore & {
     write?: boolean
+    write_content_bypass?: boolean
   }
 >(initialObjStore)
 
@@ -65,6 +67,8 @@ export const ObjStore = {
   setHeader: (header: string) => setObjStore("header", header),
   setRelated: (related: Obj[]) => setObjStore("related", related),
   setWrite: (write: boolean) => setObjStore("write", write),
+  setWriteContentBypass: (write_content_bypass: boolean) =>
+    setObjStore("write_content_bypass", write_content_bypass),
   // setGetResp: (resp: FsGetResp) => {
   //   setObjStore("obj", resp.data);
   //   setObjs(resp.data.related);
@@ -76,6 +80,8 @@ export const ObjStore = {
   //   setObjStore("write", resp.data.write);
   // },
   setState: (state: State) => setObjStore("state", state),
+  setDirectUploadTools: (tools?: string[]) =>
+    setObjStore("direct_upload_tools", tools),
   setErr: (err: string) => setObjStore("err", err),
 }
 
